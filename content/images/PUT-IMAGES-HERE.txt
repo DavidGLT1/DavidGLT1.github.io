@@ -1,0 +1,1 @@
+Put your picture files in this folder, then type the file name on an Image: line in a content file (e.g.  Image: poster.jpg ).

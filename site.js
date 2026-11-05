@@ -196,7 +196,12 @@ var mute=document.getElementById('mute');skin(mute,['audio button'],true);
 function setMute(){mute.setAttribute('aria-pressed',sound);setKey(mute,sound?get('audio on label'):get('audio off label'),sound?ic('audio on icon'):ic('audio off icon'))}
 mute.onclick=function(){if(!sound){sound=true;wake();setMute();sfx.on()}else{sfx.off();sound=false;setMute()}};
 setMute();
-var clock=document.getElementById('clock');function tick(){clock.textContent=new Date().toISOString().slice(11,19)}tick();setInterval(tick,1000);
+var clock=document.getElementById('clock'),lclock=document.getElementById('clockLocal'),tzl=document.getElementById('tzLabel');
+function two(v){return(v<10?'0':'')+v}
+function tick(){var d=new Date();clock.textContent=d.toISOString().slice(11,19);
+  lclock.textContent=two(d.getHours())+':'+two(d.getMinutes())+':'+two(d.getSeconds());          /* the viewer's own local time */
+  try{var p=new Intl.DateTimeFormat(undefined,{timeZoneName:'short'}).formatToParts(d);for(var i=0;i<p.length;i++)if(p[i].type==='timeZoneName'){tzl.textContent=p[i].value;break}}catch(e){}}   /* e.g. GMT, PST, CEST */
+tick();setInterval(tick,1000);
 var heads=[].slice.call(document.querySelectorAll('#nav .navkey'));
 heads.forEach(function(b){b.onclick=function(){
   var open=b.getAttribute('aria-expanded')!=='true';                          /* click a closed button to drop its section down, click an open one to close it */
@@ -274,8 +279,8 @@ var CAMS={1:{f:[1,0,0],u:[0,0,1],r:[0,-1,0],F:138.6},2:{f:[0,0,-1],u:[1,0,0],r:[
 /* ----- stars: a few small white and blue dots ----- */
 var SX=[],SY=[],SZ=[],SC=[];
 for(var k=0;k<220;k++){var zz=R()*2-1,aa=R()*6.2832,rr=Math.sqrt(1-zz*zz);SX.push(rr*Math.cos(aa));SY.push(rr*Math.sin(aa));SZ.push(zz);SC.push(R()<.3?pack(140,185,255):pack(255,255,255))}
-function stars(cm,now){
-  var th=now*1.2e-5,ct=Math.cos(th),st=Math.sin(th);
+function stars(cm,now,dir){
+  var th=now*1.2e-5*(dir||1),ct=Math.cos(th),st=Math.sin(th);
   for(var k=0;k<SX.length;k++){
     var x=SX[k]*ct+SZ[k]*st,z=-SX[k]*st+SZ[k]*ct,y=SY[k],cz=x*cm.f[0]+y*cm.f[1]+z*cm.f[2];if(cz<.05)continue;
     var sx=(W/2+cm.F*(x*cm.r[0]+y*cm.r[1]+z*cm.r[2])/cz)|0,sy=(H/2-cm.F*(x*cm.u[0]+y*cm.u[1]+z*cm.u[2])/cz)|0;
@@ -283,7 +288,7 @@ function stars(cm,now){
 
 /* ----- CAM 1: looking straight ahead at the horizon ----- */
 function drawHorizon(dX,dY,now){
-  u32.fill(BLACK);stars(CAMS[1],now);
+  u32.fill(BLACK);stars(CAMS[1],now,-1);
   var plx=-dY*.5774,ply=dX*.5774,x,y;
   for(x=0;x<W;x++){
     var c=2*x/W-1,rx=dX+plx*c,ry=dY+ply*c,yb=H,z=1,dz=.6;

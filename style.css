@@ -186,3 +186,9 @@ body::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;op
 .accinner{min-height:0;overflow:hidden}
 .accinner .screen{margin-top:1rem;min-height:0}
 @media (prefers-reduced-motion:reduce){.accbody,.acc.open .accbody{transition:none}}
+
+/* ===== SPACESHIP CONTROLS: the controls and the camera screen sit as a centered pair ===== */
+.ctrlside{width:12rem}
+@media(min-width:760px){.ctrlpad{grid-template-columns:auto minmax(0,27.3rem);justify-content:center;column-gap:clamp(1.5rem,17vw,13.1rem)}.ctrlpad .scope{width:100%}}
+/* ===== TOP BAR CLOCKS ===== */
+#clock,#clockLocal{font-variant-numeric:tabular-nums;color:var(--ink)}

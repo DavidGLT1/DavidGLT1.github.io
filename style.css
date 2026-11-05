@@ -27,8 +27,8 @@ h1,h2,h3{font-family:var(--display);margin:0;text-transform:uppercase}
 .key:hover{box-shadow:inset 0 0 18px color-mix(in srgb,var(--accent) 35%,transparent)}
 .key:active{transform:translateY(1px) scale(.99)}
 .key::before{content:"";width:.55rem;height:.55rem;background:var(--dim);border-radius:50%;flex:none}
-.key[aria-selected="true"],.key[aria-pressed="true"]{background:color-mix(in srgb,var(--accent) 20%,var(--panel));box-shadow:inset 0 0 20px color-mix(in srgb,var(--accent) 40%,transparent)}
-.key[aria-selected="true"]::before,.key[aria-pressed="true"]::before{background:var(--accent);box-shadow:0 0 10px var(--accent)}
+.key[aria-selected="true"],.key[aria-expanded="true"],.key[aria-pressed="true"]{background:color-mix(in srgb,var(--accent) 20%,var(--panel));box-shadow:inset 0 0 20px color-mix(in srgb,var(--accent) 40%,transparent)}
+.key[aria-selected="true"]::before,.key[aria-expanded="true"]::before,.key[aria-pressed="true"]::before{background:var(--accent);box-shadow:0 0 10px var(--accent)}
 .key.go{background:var(--accent);color:#04101f;font-weight:800}.key.go::before{background:#04101f}
 
 /* ===== HERO + CAMERA SCREEN ===== */
@@ -122,7 +122,7 @@ h1{font-weight:900;font-size:clamp(2rem,5.4vw,3.7rem);line-height:1.05;margin-bo
 .key.hasicon::before{display:none}
 .key .ico{display:inline-flex;align-items:center;justify-content:center;flex:none;min-width:1.1em;line-height:1;font-size:1.1em;color:var(--dim)}
 .key .ico img{display:block;height:1.25em;width:auto;max-width:none;margin:0}
-.key[aria-selected="true"] .ico,.key[aria-pressed="true"] .ico{color:var(--accent);filter:drop-shadow(0 0 6px var(--accent))}
+.key[aria-selected="true"] .ico,.key[aria-expanded="true"] .ico,.key[aria-pressed="true"] .ico{color:var(--accent);filter:drop-shadow(0 0 6px var(--accent))}
 .key.go .ico,.key.go[aria-pressed="true"] .ico{color:#04101f;filter:none}
 .camkeys .key .ico,.camkeys .key[aria-pressed="true"] .ico{color:#262a38;filter:none}
 
@@ -173,3 +173,16 @@ body::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;op
 .redalert body::before{animation:alertpulse 1s ease-in-out 5}
 @keyframes alertpulse{0%,100%{opacity:0}45%{opacity:1}}
 @media (prefers-reduced-motion:reduce){.redalert body::before{animation:none;opacity:.8}}
+
+/* ===== MENU: big centered buttons under the headline, each dropping its section down beneath it ===== */
+.menu{display:grid;gap:1rem;justify-items:center;margin-top:.5rem}
+.acc{width:100%;display:grid;justify-items:center}
+/* the menu buttons are 50% bigger than ordinary buttons */
+.navkey{font-size:1.275rem;padding:1.125rem 1.65rem;gap:.9rem;min-width:min(100%,26rem);justify-content:center;clip-path:polygon(0 12px,12px 0,100% 0,100% calc(100% - 12px),calc(100% - 12px) 100%,0 100%)}
+.navkey::before{width:.825rem;height:.825rem}
+/* the drop-down: the row grows from nothing to its full height while it fades in, and shrinks and fades back out */
+.accbody{width:100%;display:grid;grid-template-rows:0fr;opacity:0;visibility:hidden;transition:grid-template-rows .55s cubic-bezier(.4,0,.2,1),opacity .35s ease,visibility 0s linear .55s}
+.acc.open .accbody{grid-template-rows:1fr;opacity:1;visibility:visible;transition:grid-template-rows .55s cubic-bezier(.4,0,.2,1),opacity .45s ease .1s,visibility 0s}
+.accinner{min-height:0;overflow:hidden}
+.accinner .screen{margin-top:1rem;min-height:0}
+@media (prefers-reduced-motion:reduce){.accbody,.acc.open .accbody{transition:none}}

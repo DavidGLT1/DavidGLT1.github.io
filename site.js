@@ -99,8 +99,8 @@ function skin(b,pre,stateful){
   function rest(){var o=isOn?(ok(C.loop)||ok(C.on)):ok(C.off);paint(o&&o.url)}   /* the picture a button settles on */
   function change(on){if(on===isOn)return;isOn=on;clearTimeout(timer);var o=ok(on?C.onOnce:C.offOnce);
     if(o){paint(o.url+'?'+(++n));timer=setTimeout(rest,o.ms)}else rest()}   /* the ?number makes the animation start again from its first frame */
-  function read(){return b.getAttribute('aria-selected')==='true'||b.getAttribute('aria-pressed')==='true'}
-  if(stateful){setTimeout(function(){isOn=read();rest();new MutationObserver(function(){change(read())}).observe(b,{attributes:true,attributeFilter:['aria-selected','aria-pressed']})},0)}
+  function read(){return b.getAttribute('aria-selected')==='true'||b.getAttribute('aria-expanded')==='true'||b.getAttribute('aria-pressed')==='true'}
+  if(stateful){setTimeout(function(){isOn=read();rest();new MutationObserver(function(){change(read())}).observe(b,{attributes:true,attributeFilter:['aria-selected','aria-expanded','aria-pressed']})},0)}
   else{rest();
     b.addEventListener('pointerdown',function(){change(true)});
     ['pointerup','pointercancel','pointerleave'].forEach(function(ev){b.addEventListener(ev,function(){change(false)})});
@@ -130,16 +130,17 @@ function build(){
   [].forEach.call(document.querySelectorAll('[data-cam]'),function(b){var i=ic('camera '+b.dataset.cam+' icon');if(i)setKey(b,b.textContent,i);skin(b,['cam '+b.dataset.cam+' button'],true)});
   var logo=get('hero image'),h1=document.querySelector('.hero h1');                /* a logo picture replaces the headline words */
   if(logo)logoFx(h1,'content/images/'+logo,get('hero image description'),get('hero headline'));
-  var nav=document.getElementById('nav'),screens=document.getElementById('screens'),n=0;
+  var nav=document.getElementById('nav'),n=0;
   var NAV=text('NAV_TEXT','content/navigation.js'),hasCtl=NAV.split('\n').some(function(l){l=l.trim();return l[0]!=='#'&&/\|\s*spaceship-controls\s*$/i.test(l)});
   if(!hasCtl)NAV+='\n'+(ct('screen name')||'SPACESHIP CONTROLS')+' | spaceship-controls';   /* the button appears under the others unless you place it yourself in content/navigation.js */
   NAV.split('\n').forEach(function(l){
     l=l.trim();if(!l||l[0]==='#'||l.indexOf('|')<0)return;
     var a=l.split('|'),label=a[0].trim(),page=a[1].trim().toLowerCase();n++;
-    var b=el('button','key'),p=el('div');setKey(b,label,ic('menu button icon for '+page)||ic('menu button icon'));b.setAttribute('role','tab');b.id='t'+n;b.setAttribute('aria-controls','p'+n);b.setAttribute('aria-selected',n===1);skin(b,['menu button for '+page,'menu button'],true);
-    p.setAttribute('role','tabpanel');p.id='p'+n;p.setAttribute('aria-labelledby',b.id);p.hidden=n>1;p.appendChild(el('h2','',label));
+    var b=el('button','key navkey'),item=el('div','acc'),body=el('div','accbody'),inner=el('div','accinner'),p=el('div','panel screen');
+    setKey(b,label,ic('menu button icon for '+page)||ic('menu button icon'));b.id='t'+n;b.setAttribute('aria-controls','p'+n);b.setAttribute('aria-expanded','false');skin(b,['menu button for '+page,'menu button'],true);
+    p.setAttribute('role','region');p.id='p'+n;p.setAttribute('aria-labelledby',b.id);p.appendChild(el('h2','',label));
     if(RENDER.hasOwnProperty(page))RENDER[page](p);else loadPage(page,p);
-    nav.appendChild(b);screens.appendChild(p)})}
+    inner.appendChild(p);body.appendChild(inner);item.appendChild(b);item.appendChild(body);nav.appendChild(item)})}
 function loadPage(name,p){
   if(!/^[a-z0-9_-]+$/.test(name)){p.appendChild(el('p','','⚠ The page name "'+name+'" in content/navigation.js should use only lowercase letters, numbers and dashes.'));return}
   pending[name]=p;var s=el('script');s.dataset.page=name;s.src='content/pages/'+name+'.js';
@@ -174,7 +175,7 @@ function finish(){
   if(bootClip&&!bootClip.paused){var bc=bootClip,v0=bc.volume,n2=0,fd=setInterval(function(){n2++;bc.volume=Math.max(0,v0*(1-n2/14));if(n2>=14){clearInterval(fd);bc.pause();bc.volume=v0}},100)}   /* fade your start-up sound out as the doors open */
   if(hum&&ctx){var n=ctx.currentTime;hum.g.gain.cancelScheduledValues(n);hum.g.gain.setValueAtTime(Math.max(hum.g.gain.value,.0002),n);hum.g.gain.exponentialRampToValueAtTime(.0001,n+1.4);hum.os.forEach(function(o){o.stop(n+1.5)})}
   sfx.whoosh();boot.classList.add('open');
-  setTimeout(function(){boot.hidden=true;document.body.style.overflow='';document.querySelector('[role=tab]').focus()},1200)}
+  setTimeout(function(){boot.hidden=true;document.body.style.overflow='';document.querySelector('#nav .navkey').focus()},1200)}
 function engage(snd){
   sound=snd;if(snd)wake();if(!ctx)sound=false;setMute();
   document.getElementById('start').hidden=true;var term=document.getElementById('term');term.hidden=false;term.classList.add('on');
@@ -196,9 +197,12 @@ function setMute(){mute.setAttribute('aria-pressed',sound);setKey(mute,sound?get
 mute.onclick=function(){if(!sound){sound=true;wake();setMute();sfx.on()}else{sfx.off();sound=false;setMute()}};
 setMute();
 var clock=document.getElementById('clock');function tick(){clock.textContent=new Date().toISOString().slice(11,19)}tick();setInterval(tick,1000);
-var tabs=[].slice.call(document.querySelectorAll('[role=tab]'));
-tabs.forEach(function(t){t.onclick=function(){
-  tabs.forEach(function(o){var on=o===t;o.setAttribute('aria-selected',on);document.getElementById(o.getAttribute('aria-controls')).hidden=!on});sfx.tab();if(reduce)render(performance.now())}});
+var heads=[].slice.call(document.querySelectorAll('#nav .navkey'));
+heads.forEach(function(b){b.onclick=function(){
+  var open=b.getAttribute('aria-expanded')!=='true';                          /* click a closed button to drop its section down, click an open one to close it */
+  heads.forEach(function(o){var on=open&&o===b;o.setAttribute('aria-expanded',on);o.parentNode.classList.toggle('open',on)});
+  sfx.tab();if(reduce)render(performance.now());
+  if(open)setTimeout(function(){var r=b.getBoundingClientRect();if(r.top<0)window.scrollTo({top:window.scrollY+r.top-16,behavior:reduce?'auto':'smooth'})},600)}});   /* if sections above closed and pushed the button off the top of the screen, bring it back */
 
 /* ===================================================================
    LOGO EFFECT — draws the logo with faint scan lines that glitch for a
@@ -361,7 +365,7 @@ camKeys.forEach(function(b){
     if(!e.detail){sfx.key();setTimeout(sfx.keyUp,80)}                  /* keyboard presses get both sounds too */
     var n=+b.dataset.cam;if(n===cam)return;                             /* same camera: nothing changes */
     cam=n;glitch=7;camKeys.forEach(function(o){o.setAttribute('aria-pressed',o===b)});sfx.static();setLabel();if(reduce)render(performance.now())}});
-function loop(now){if(!reduce)requestAnimationFrame(loop);if(now-last<66)return;last=now;if(!cv.offsetParent)return;render(now)}
+function loop(now){if(!reduce)requestAnimationFrame(loop);if(now-last<66)return;last=now;if(!cv.closest('.acc.open'))return;render(now)}
 setLabel();loop(performance.now());
 
 /* ===================================================================

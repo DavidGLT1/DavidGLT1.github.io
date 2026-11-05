@@ -11,7 +11,7 @@ window.BUTTON_TEXT = `
 #          CAM 1 button on: blue.png
 #          CAM 1 button off: dark-blue.png
 #      "on" is the picture shown while the button is switched on, "off" while it is switched off.
-#      Menu buttons and camera buttons stay on until you pick another one. The audio button is on when the sound is on.
+#      Menu buttons are on while their section is dropped down and off when it is closed. Camera buttons stay on until you pick another one. The audio button is on when the sound is on.
 #      Buttons that are never "left on" (the start-up screen buttons and the link buttons) count as "on" only while they are pressed down, and "off" when let go.
 #   3. The picture is stretched to fill the whole button, so make it the same shape as the button.
 #

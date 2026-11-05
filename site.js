@@ -49,6 +49,8 @@ function list(n,f){return blocks(text(n,f))}
 function el(tag,cls,txt){var e=document.createElement(tag);if(cls)e.className=cls;if(txt)e.textContent=txt;return e}
 function img(a,e){if(e.image){var m=el('img');m.src='content/images/'+e.image;m.alt=e.title||e.heading||'';a.appendChild(m)}}
 /* ===== BUTTON ICONS — read from content/icons.js ===== */
+var CT=fields(text('CONTROLS_TEXT','content/spaceship-controls.js'));
+function ct(k){for(var i=0;i<CT.length;i++)if(CT[i][0]===k)return CT[i][1];return''}
 var IC=fields(text('ICON_TEXT','content/icons.js')),seen={};
 function ic(k){for(var i=0;i<IC.length;i++)if(IC[i][0]===k)return IC[i][1];return''}
 function note(msg){if(seen[msg])return;seen[msg]=1;document.body.insertBefore(el('div','warn',msg),document.body.firstChild)}
@@ -64,11 +66,15 @@ function spec(k){for(var i=0;i<SN.length;i++)if(SN[i][0]===k){var p=SN[i][1].spl
   if(!f)return null;return{file:f,vol:isNaN(v)?1:Math.max(0,Math.min(100,v))/100,off:/^(off|none|silent)$/i.test(f)}}return null}
 function clip(file,onfail){var a=new Audio('content/sounds/'+file);a.preload='auto';
   a.onerror=function(){note('⚠ Could not play content/sounds/'+file+' — check the file name matches the line in content/sounds.js and that it is an mp3, wav or ogg file. The built-in sound is used instead.');onfail()};return a}
-var SND={tab:'menu button sound',on:'audio on sound',off:'audio off sound',tx:'link button sound',relay:'boot relay sound',chat:'boot typing sound',whoosh:'door sound',static:'camera change sound',key:'camera key down sound',keyUp:'camera key up sound'};
+/* extra sounds for the spaceship controls screen */
+sfx.alert=function(){for(var k=0;k<10;k++)tone(k%2?740:1040,.22,'square',.07,0,k*.5)};                                  /* emergency beeps for 5 seconds */
+sfx.swOn=function(){noise(.015,3500,2500,.4,0,3);tone(180,.05,'square',.07,90);tone(120,.7,'sawtooth',.05,520,.05)};    /* switch flicks up, engines spin up */
+sfx.swOff=function(){noise(.015,3000,2000,.3,0,3);tone(150,.05,'square',.06,80);tone(500,.6,'sawtooth',.04,110,.05)};  /* switch drops, engines spin down */
+var SND={tab:'menu button sound',on:'audio on sound',off:'audio off sound',tx:'link button sound',relay:'boot relay sound',chat:'boot typing sound',whoosh:'door sound',static:'camera change sound',key:'camera key down sound',keyUp:'camera key up sound',alert:'red alert sound',swOn:'speed switch on sound',swOff:'speed switch off sound'};
 Object.keys(SND).forEach(function(k){var s=spec(SND[k]);if(!s)return;var old=sfx[k];
   if(s.off){sfx[k]=function(){};return}
   var a=clip(s.file,function(){sfx[k]=old});
-  sfx[k]=function(){if(!sound)return;var c=a.cloneNode();c.volume=s.vol;var p=c.play();if(p&&p.catch)p.catch(function(){})}});
+  sfx[k]=function(){if(!sound)return;var c=a.cloneNode();c.volume=s.vol;var p=c.play();if(p&&p.catch)p.catch(function(){});return c}});
 (function(){var s=spec('boot sound');if(!s)return;if(s.off){bootOff=true;return}bootClip=clip(s.file,function(){bootClip=null});bootClip.volume=s.vol})();
 
 /* ===== BUTTON PICTURES AND ANIMATIONS — read from content/buttons.js. Empty lines keep the current button look. ===== */
@@ -112,16 +118,22 @@ var RENDER={
     list('COMMS_TEXT','content/comms.js').forEach(function(e){row.appendChild(btn(e,function(){ro.textContent=get('comms sent message')}))});p.appendChild(row);p.appendChild(ro)}
 };
 
+RENDER['spaceship-controls']=function(p){p.appendChild(document.getElementById('ctrlpad'))};   /* the camera view, red alert and speed switch live here */
+
 /* ===== BUILD THE PAGE FROM THE CONTENT FILES ===== */
 function build(){
   document.querySelectorAll('[data-text]').forEach(function(x){x.textContent=get(x.dataset.text)});
   document.title=get('browser tab title');
+  document.getElementById('alertBtn').textContent=ct('red alert button')||'RED ALERT';
+  document.getElementById('swlabel').textContent=ct('speed switch label')||'DOUBLE SPEED';
   [['bootSound','start-up sound button icon','start-up sound button'],['bootSilent','start-up silent button icon','start-up silent button'],['skip','skip button icon','skip button']].forEach(function(p){var b=document.getElementById(p[0]);setKey(b,b.textContent,ic(p[1]));skin(b,[p[2]],false)});
   [].forEach.call(document.querySelectorAll('[data-cam]'),function(b){var i=ic('camera '+b.dataset.cam+' icon');if(i)setKey(b,b.textContent,i);skin(b,['cam '+b.dataset.cam+' button'],true)});
   var logo=get('hero image'),h1=document.querySelector('.hero h1');                /* a logo picture replaces the headline words */
   if(logo)logoFx(h1,'content/images/'+logo,get('hero image description'),get('hero headline'));
   var nav=document.getElementById('nav'),screens=document.getElementById('screens'),n=0;
-  text('NAV_TEXT','content/navigation.js').split('\n').forEach(function(l){
+  var NAV=text('NAV_TEXT','content/navigation.js'),hasCtl=NAV.split('\n').some(function(l){l=l.trim();return l[0]!=='#'&&/\|\s*spaceship-controls\s*$/i.test(l)});
+  if(!hasCtl)NAV+='\n'+(ct('screen name')||'SPACESHIP CONTROLS')+' | spaceship-controls';   /* the button appears under the others unless you place it yourself in content/navigation.js */
+  NAV.split('\n').forEach(function(l){
     l=l.trim();if(!l||l[0]==='#'||l.indexOf('|')<0)return;
     var a=l.split('|'),label=a[0].trim(),page=a[1].trim().toLowerCase();n++;
     var b=el('button','key'),p=el('div');setKey(b,label,ic('menu button icon for '+page)||ic('menu button icon'));b.setAttribute('role','tab');b.id='t'+n;b.setAttribute('aria-controls','p'+n);b.setAttribute('aria-selected',n===1);skin(b,['menu button for '+page,'menu button'],true);
@@ -186,7 +198,7 @@ setMute();
 var clock=document.getElementById('clock');function tick(){clock.textContent=new Date().toISOString().slice(11,19)}tick();setInterval(tick,1000);
 var tabs=[].slice.call(document.querySelectorAll('[role=tab]'));
 tabs.forEach(function(t){t.onclick=function(){
-  tabs.forEach(function(o){var on=o===t;o.setAttribute('aria-selected',on);document.getElementById(o.getAttribute('aria-controls')).hidden=!on});sfx.tab()}});
+  tabs.forEach(function(o){var on=o===t;o.setAttribute('aria-selected',on);document.getElementById(o.getAttribute('aria-controls')).hidden=!on});sfx.tab();if(reduce)render(performance.now())}});
 
 /* ===================================================================
    LOGO EFFECT — draws the logo with faint scan lines that glitch for a
@@ -219,7 +231,7 @@ function logoFx(h1,url,alt,fallback){
    =================================================================== */
 var cv=document.getElementById('moon'),c2=cv.getContext('2d'),W=160,H=160,MS=256,hm=new Float32Array(MS*MS);
 var CAMH=50;            /* spacecraft altitude: 50 map units x 40 m = 2000 m, never changes */
-var cam=1,glitch=0,px=40,py=90,prev=0,last=0,hudT=0,V=document.getElementById('vel'),P=document.getElementById('pos');
+var boost=1,boostTarget=1,cam=1,glitch=0,px=40,py=90,prev=0,last=0,hudT=0,V=document.getElementById('vel'),P=document.getElementById('pos');
 var s=7;function R(){s|=0;s=s+0x6D2B79F5|0;var t=Math.imul(s^s>>>15,1|s);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}
 function pack(r,g,b){return(255<<24)|(b<<16)|(g<<8)|r}
 
@@ -336,11 +348,11 @@ function setLabel(){
   document.querySelector('.hud.tr').textContent=cam===3?get('monitor station label'):get('monitor top right')}
 function render(now){
   var dt=Math.min(.2,(now-prev)/1000||0),ang=Math.sin(now*.00013)*.5+Math.sin(now*.00041)*.12,dX=Math.cos(ang),dY=Math.sin(ang);prev=now;
-  px+=dX*42*dt;py+=dY*42*dt;                          /* 42 units a second = about 1.67 km/s */
+  boost+=(boostTarget-boost)*Math.min(1,dt*3);px+=dX*42*boost*dt;py+=dY*42*boost*dt;                          /* 42 units a second = about 1.67 km/s */
   if(glitch>0){glitch--;for(var i=0;i<W*H;i++)u32[i]=pal[Math.random()*140|0]}
   else if(cam===1)drawHorizon(dX,dY,now);else if(cam===2)drawDown(dX,dY);else drawUp(now);
   dither();c2.putImageData(img2,0,0);
-  if(now-hudT>200){hudT=now;V.textContent=(1.67+Math.sin(now*.001)*.01).toFixed(2);P.innerHTML='Lat '+(px/400%90).toFixed(2)+' N<br>Lon '+(py/380%180).toFixed(2)+' E'}}
+  if(now-hudT>200){hudT=now;V.textContent=((1.67+Math.sin(now*.001)*.01)*boost).toFixed(2);P.innerHTML='Lat '+(px/400%90).toFixed(2)+' N<br>Lon '+(py/380%180).toFixed(2)+' E'}}
 var reduce=window.matchMedia('(prefers-reduced-motion:reduce)').matches,camKeys=[].slice.call(document.querySelectorAll('[data-cam]'));
 camKeys.forEach(function(b){
   b.addEventListener('pointerdown',function(){sfx.key()});             /* the click plays the moment the key is pushed down */
@@ -349,12 +361,26 @@ camKeys.forEach(function(b){
     if(!e.detail){sfx.key();setTimeout(sfx.keyUp,80)}                  /* keyboard presses get both sounds too */
     var n=+b.dataset.cam;if(n===cam)return;                             /* same camera: nothing changes */
     cam=n;glitch=7;camKeys.forEach(function(o){o.setAttribute('aria-pressed',o===b)});sfx.static();setLabel();if(reduce)render(performance.now())}});
-function loop(now){if(!reduce)requestAnimationFrame(loop);if(now-last<66)return;last=now;render(now)}
+function loop(now){if(!reduce)requestAnimationFrame(loop);if(now-last<66)return;last=now;if(!cv.offsetParent)return;render(now)}
 setLabel();loop(performance.now());
 
 /* ===================================================================
    WHOLE-SCREEN EFFECT — faint scan lines (see style.css) plus a small glitch every 15 to 30 seconds
    =================================================================== */
+/* ===================================================================
+   SPACESHIP CONTROLS — red alert button and double-speed switch
+   =================================================================== */
+var alertBtn=document.getElementById('alertBtn'),speedSw=document.getElementById('speedSw'),cmsg=document.getElementById('ctrlmsg'),alertOn=false,boostOn=false;
+skin(alertBtn,['red alert button'],true);skin(speedSw,['speed switch'],true);
+function status(){var m=[];if(alertOn)m.push(ct('red alert message')||'RED ALERT');if(boostOn)m.push(ct('speed message')||'Double speed');cmsg.textContent=m.join('  ')||ct('idle message')}
+status();
+alertBtn.onclick=function(){
+  if(alertOn)return;alertOn=true;alertBtn.setAttribute('aria-pressed','true');root.classList.add('redalert');var h=sfx.alert();status();
+  setTimeout(function(){alertOn=false;alertBtn.setAttribute('aria-pressed','false');root.classList.remove('redalert');if(h&&h.pause)h.pause();status()},5000)};
+speedSw.onclick=function(){
+  if(boostOn)return;boostOn=true;speedSw.setAttribute('aria-pressed','true');boostTarget=2;sfx.swOn();status();
+  setTimeout(function(){boostOn=false;speedSw.setAttribute('aria-pressed','false');boostTarget=1;sfx.swOff();status()},5000)};
+
 var fx=el('div','screenfx');fx.setAttribute('aria-hidden','true');document.body.appendChild(fx);
 function glitchPage(){fx.style.setProperty('--gy',(10+Math.random()*75)+'%');root.classList.add('glitching');setTimeout(function(){root.classList.remove('glitching')},400)}
 function nextGlitch(){setTimeout(function(){glitchPage();nextGlitch()},15000+Math.random()*15000)}

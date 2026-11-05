@@ -42,32 +42,46 @@
     </div>
   </header>
 
-  <!-- HERO + CAMERA SCREEN -->
+  <!-- HERO -->
   <section class="panel hero">
     <div>
       <p class="tag" data-text="hero label"></p>
       <h1 data-text="hero headline"></h1>
       <p class="lede" data-text="hero paragraph"></p>
     </div>
-    <div class="scope">
-      <div class="bezel">
-        <div class="crt">
-          <canvas id="moon" width="160" height="160" role="img" aria-label="Live camera view from the spacecraft: the lunar surface, space, and a space station"></canvas>
-          <div class="fx vig"></div>
-          <div class="hud tl"><i class="rec"></i><span data-text="monitor top left"></span></div>
-          <div class="hud tr" data-text="monitor top right"></div>
-          <div class="hud bl">Alt <b id="alt">2000</b> m<br>Vel <b id="vel">1.67</b> km/s</div>
-          <div class="hud br" id="pos">Lat 00.67 N<br>Lon 23.47 E</div>
-        </div>
-      </div>
-      <div class="camkeys" role="group" aria-label="Camera selection">
-        <button class="key" data-cam="1" aria-pressed="true" data-text="cam button 1"></button>
-        <button class="key" data-cam="2" aria-pressed="false" data-text="cam button 2"></button>
-        <button class="key" data-cam="3" aria-pressed="false" data-text="cam button 3"></button>
-      </div>
-      <div class="plate" data-text="monitor plate"></div>
-    </div>
   </section>
+
+  <!-- SPACESHIP CONTROLS SCREEN: kept here until site.js places it in its own console screen -->
+  <div id="holding" hidden>
+    <div class="ctrlpad" id="ctrlpad">
+      <div class="ctrlside">
+        <button class="key alert" id="alertBtn" aria-pressed="false"></button>
+        <div class="swrow">
+          <button class="key switch" id="speedSw" aria-pressed="false" aria-labelledby="swlabel"><span class="slot" aria-hidden="true"><i class="knob"></i></span></button>
+          <span class="swlabel" id="swlabel"></span>
+        </div>
+        <p class="readout" id="ctrlmsg" aria-live="polite"></p>
+      </div>
+      <div class="scope">
+        <div class="bezel">
+          <div class="crt">
+            <canvas id="moon" width="160" height="160" role="img" aria-label="Live camera view from the spacecraft: the lunar surface, space, and a space station"></canvas>
+            <div class="fx vig"></div>
+            <div class="hud tl"><i class="rec"></i><span data-text="monitor top left"></span></div>
+            <div class="hud tr" data-text="monitor top right"></div>
+            <div class="hud bl">Alt <b id="alt">2000</b> m<br>Vel <b id="vel">1.67</b> km/s</div>
+            <div class="hud br" id="pos">Lat 00.67 N<br>Lon 23.47 E</div>
+          </div>
+        </div>
+        <div class="camkeys" role="group" aria-label="Camera selection">
+          <button class="key" data-cam="1" aria-pressed="true" data-text="cam button 1"></button>
+          <button class="key" data-cam="2" aria-pressed="false" data-text="cam button 2"></button>
+          <button class="key" data-cam="3" aria-pressed="false" data-text="cam button 3"></button>
+        </div>
+        <div class="plate" data-text="monitor plate"></div>
+      </div>
+    </div>
+  </div>
 
   <!-- BUTTONS + SCREENS (built automatically from content/navigation.js) -->
   <div class="console">
@@ -86,6 +100,7 @@
 <script src="content/icons.js"></script>
 <script src="content/sounds.js"></script>
 <script src="content/buttons.js"></script>
+<script src="content/spaceship-controls.js"></script>
 <script src="site.js"></script>
 </body>
 </html>

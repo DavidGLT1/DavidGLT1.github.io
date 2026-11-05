@@ -33,7 +33,7 @@ h1,h2,h3{font-family:var(--display);margin:0;text-transform:uppercase}
 
 /* ===== HERO + CAMERA SCREEN ===== */
 .hero{display:grid;gap:1.5rem;align-items:center;padding:clamp(1.5rem,4vw,2.5rem)}
-@media(min-width:860px){.hero{grid-template-columns:minmax(0,1fr) minmax(0,.93fr)}}
+.hero{justify-items:center;text-align:center}
 h1{font-weight:900;font-size:clamp(2rem,5.4vw,3.7rem);line-height:1.05;margin-bottom:1.2rem}
 .lede{max-width:34rem;margin:0;color:var(--dim)}
 .fx{position:absolute;inset:0;pointer-events:none}
@@ -131,3 +131,45 @@ h1{font-weight:900;font-size:clamp(2rem,5.4vw,3.7rem);line-height:1.05;margin-bo
 .key.skinned::before{display:none}
 .key.nowords{color:transparent!important;text-shadow:none!important}
 .key.nowords .ico{visibility:hidden}
+
+/* ===== HERO HEADLINE: centered and in proportion ===== */
+.hero .lede{margin:0 auto;max-width:40rem}
+.hero h1{margin-left:auto;margin-right:auto}
+.hero h1.logo{margin:0 auto 1.2rem}
+.hero h1.logo canvas{width:auto;height:auto;max-width:min(100%,38rem);max-height:16rem;margin:0 auto}
+
+/* ===== SPACESHIP CONTROLS SCREEN ===== */
+.ctrlpad{display:grid;gap:1.5rem;align-items:center;justify-items:center}
+@media(min-width:760px){.ctrlpad{grid-template-columns:minmax(11rem,15rem) minmax(0,1fr)}}
+@media(max-width:759px){.ctrlpad .scope{order:-1}}
+.ctrlpad .scope{width:min(90%,27.3rem)}   /* camera screen: 10% smaller than before */
+.ctrlside{display:grid;gap:1.6rem;justify-items:center;align-content:center;width:100%}
+.ctrlside .readout{margin:0;text-align:center;font-size:.85rem;min-height:2.6em}
+.swrow{display:grid;justify-items:center;gap:.7rem;text-align:center}
+.swlabel{font-family:var(--display);font-size:.75rem;letter-spacing:.12em;text-transform:uppercase;color:var(--dim)}
+/* red alert button: a big red round push-button that stays sunk while the alert runs */
+.key.alert{width:9.5rem;height:9.5rem;padding:0 .6rem;justify-content:center;text-align:center;line-height:1.2;font-size:.9rem;font-weight:800;color:#fff;text-shadow:0 1px 2px rgba(0,0,0,.6);clip-path:none;border-radius:50%;border:3px solid #6e0d0d;background:radial-gradient(circle at 50% 32%,#ff8a8a,#e01b1b 55%,#8e0b0b);box-shadow:0 7px 0 #520808,0 12px 16px rgba(0,0,0,.65),inset 0 0 16px rgba(255,255,255,.25)}
+.key.alert::before{display:none}
+.key.alert:hover{filter:brightness(1.08)}
+.key.alert:active,.key.alert[aria-pressed="true"]{transform:translateY(6px);box-shadow:0 1px 0 #520808,0 3px 6px rgba(0,0,0,.65),inset 0 0 22px rgba(255,255,255,.35),0 0 30px rgba(255,40,40,.9);background:radial-gradient(circle at 50% 32%,#ff9a9a,#f02a2a 55%,#9e1010)}
+/* speed switch: an up-and-down toggle lever. Up = double speed. */
+.key.switch{width:4.2rem;height:7.4rem;padding:0;justify-content:center;clip-path:none;border-radius:12px;border:2px solid #05091a;background:linear-gradient(#262d4d,#12172b);box-shadow:inset 0 2px 8px rgba(0,0,0,.7),0 1px 0 rgba(255,255,255,.1)}
+.key.switch::before{display:none}
+.key.switch[aria-pressed="true"]{background:linear-gradient(#262d4d,#12172b);box-shadow:inset 0 2px 8px rgba(0,0,0,.7),0 0 18px color-mix(in srgb,var(--accent) 60%,transparent)}
+.switch .slot{position:relative;display:block;width:1.3rem;height:5.2rem;border-radius:.65rem;background:#05091a;box-shadow:inset 0 2px 5px #000}
+.switch[aria-pressed="true"] .slot{box-shadow:inset 0 2px 5px #000,0 0 12px var(--accent)}
+.switch .knob{position:absolute;left:50%;bottom:.1rem;width:2.4rem;height:2.4rem;margin-left:-1.2rem;border-radius:50%;background:radial-gradient(circle at 40% 30%,#f4efe0,#c9c3ae 60%,#9a947f);box-shadow:0 3px 0 #6f6a5a,0 6px 8px rgba(0,0,0,.7);transition:bottom .22s cubic-bezier(.3,1.4,.5,1)}
+.switch[aria-pressed="true"] .knob{bottom:2.7rem}
+.switch.skinned .slot{display:none}
+
+/* ===== CAMERA SCREEN AND KEYS AT 90% SIZE ===== */
+.hud{font-size:clamp(.4rem,1.26vw,.5rem)}
+.camkeys{margin-top:.9rem;padding:.81rem .99rem 1.17rem;gap:.81rem;border-radius:9px}
+.camkeys .key{font-size:.765rem;min-width:4.32rem;padding:.72rem .9rem .81rem;border-radius:6.3px 6.3px 8px 8px;box-shadow:inset 0 0 0 3px #b9b3a0,inset 0 3px 5px rgba(0,0,0,.28),0 2.7px 0 #8f8979,0 5.4px 0 #3d3f4b,0 8px 9px rgba(0,0,0,.65)}
+.camkeys .key:active,.camkeys .key[aria-pressed="true"]{transform:translateY(4.5px);box-shadow:inset 0 0 0 3px #b0aa97,inset 0 3px 6px rgba(0,0,0,.35),0 0 0 #8f8979,0 1px 0 #3d3f4b,0 2px 4px rgba(0,0,0,.6)}
+
+/* ===== RED ALERT: the background grid glows red and pulses for 5 seconds ===== */
+body::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;opacity:0;background-image:radial-gradient(ellipse at 50% 40%,rgba(255,40,40,.3),transparent 70%),linear-gradient(rgba(255,60,60,.95) 2px,transparent 2px),linear-gradient(90deg,rgba(255,60,60,.95) 2px,transparent 2px);background-size:auto,48px 48px,48px 48px;filter:drop-shadow(0 0 6px rgba(255,40,40,.9))}
+.redalert body::before{animation:alertpulse 1s ease-in-out 5}
+@keyframes alertpulse{0%,100%{opacity:0}45%{opacity:1}}
+@media (prefers-reduced-motion:reduce){.redalert body::before{animation:none;opacity:.8}}

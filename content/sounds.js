@@ -31,6 +31,13 @@ Camera change sound:
 Camera key down sound:
 Camera key up sound:
 
+# ----- SPACESHIP CONTROLS SCREEN -----
+# The red alert siren (it is cut off after 5 seconds, when the alert ends)
+Red alert sound:
+# The speed switch flicking up, and dropping back down
+Speed switch on sound:
+Speed switch off sound:
+
 # ----- START-UP SCREEN -----
 # One long clip that plays during the whole start-up (the computer coming to life).
 # If you use this, it replaces the built-in hum and rising whine, and it fades out as the doors open.

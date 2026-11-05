@@ -110,6 +110,25 @@ Audio button off animation:
 Audio button words:
 Audio button size:
 
+# ================= SPACESHIP CONTROLS SCREEN =================
+# ----- RED ALERT BUTTON -----
+# on = while the alert is running (5 seconds), off = the rest of the time
+Red alert button on:
+Red alert button off:
+Red alert button loop animation:
+Red alert button on animation:
+Red alert button off animation:
+Red alert button words:
+Red alert button size:
+# ----- SPEED SWITCH -----
+# on = while the switch is up (5 seconds), off = the rest of the time. A picture replaces the whole switch.
+Speed switch on:
+Speed switch off:
+Speed switch loop animation:
+Speed switch on animation:
+Speed switch off animation:
+Speed switch words:
+Speed switch size:
 # ================= START-UP SCREEN BUTTONS =================
 # These count as "on" only while being pressed down.
 # ----- START-UP SOUND BUTTON -----

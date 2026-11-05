@@ -1,0 +1,4 @@
+Put your short button animations (animated gif, webp or png) in this folder.
+Then open content/buttons.js and type each file name after the colon of an animation line, for example:
+    CAM 1 button animation: pulse.gif
+You can delete this text file once you have added your own animations.

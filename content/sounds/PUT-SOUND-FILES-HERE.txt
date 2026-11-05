@@ -1,0 +1,3 @@
+Put your sound files (mp3, wav or ogg) in this folder.
+Then open content/sounds.js and type each file name after the colon of the sound you want to replace.
+You can delete this text file once you have added your own sounds.

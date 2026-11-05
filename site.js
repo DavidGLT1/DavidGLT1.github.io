@@ -48,7 +48,60 @@ function all(k){return F.filter(function(f){return f[0]===k}).map(function(f){re
 function list(n,f){return blocks(text(n,f))}
 function el(tag,cls,txt){var e=document.createElement(tag);if(cls)e.className=cls;if(txt)e.textContent=txt;return e}
 function img(a,e){if(e.image){var m=el('img');m.src='content/images/'+e.image;m.alt=e.title||e.heading||'';a.appendChild(m)}}
-function btn(e,after){var a=el('a','key go',e.button);a.href=e.link;if(/^https?:/i.test(e.link)){a.target='_blank';a.rel='noopener'}a.addEventListener('click',function(){sfx.tx();if(after)after()});return a}
+/* ===== BUTTON ICONS — read from content/icons.js ===== */
+var IC=fields(text('ICON_TEXT','content/icons.js')),seen={};
+function ic(k){for(var i=0;i<IC.length;i++)if(IC[i][0]===k)return IC[i][1];return''}
+function note(msg){if(seen[msg])return;seen[msg]=1;document.body.insertBefore(el('div','warn',msg),document.body.firstChild)}
+function iconEl(spec){var e=el('span','ico');e.setAttribute('aria-hidden','true');
+  if(/\.(png|jpe?g|gif|svg|webp)$/i.test(spec)){var m=el('img');m.alt='';m.onerror=function(){m.remove();note('⚠ Could not find content/images/'+spec+' — check the file name matches the line in content/icons.js.')};m.src='content/images/'+spec;e.appendChild(m)}
+  else e.textContent=spec;return e}
+/* puts an icon (emoji, symbol or picture) in front of a button's words; an empty icon keeps the default glowing dot; "none" removes it */
+function setKey(b,label,spec){b.textContent='';b.classList.toggle('hasicon',!!spec);if(spec&&!/^(none|off)$/i.test(spec))b.appendChild(iconEl(spec));b.appendChild(document.createTextNode(label||''))}
+
+/* ===== SOUND CLIPS — read from content/sounds.js. An empty line keeps the built-in synthesized sound. ===== */
+var SN=fields(text('SOUND_TEXT','content/sounds.js')),bootClip=null,bootOff=false;
+function spec(k){for(var i=0;i<SN.length;i++)if(SN[i][0]===k){var p=SN[i][1].split('|'),f=p[0].trim(),v=parseFloat(p[1]);
+  if(!f)return null;return{file:f,vol:isNaN(v)?1:Math.max(0,Math.min(100,v))/100,off:/^(off|none|silent)$/i.test(f)}}return null}
+function clip(file,onfail){var a=new Audio('content/sounds/'+file);a.preload='auto';
+  a.onerror=function(){note('⚠ Could not play content/sounds/'+file+' — check the file name matches the line in content/sounds.js and that it is an mp3, wav or ogg file. The built-in sound is used instead.');onfail()};return a}
+var SND={tab:'menu button sound',on:'audio on sound',off:'audio off sound',tx:'link button sound',relay:'boot relay sound',chat:'boot typing sound',whoosh:'door sound',static:'camera change sound',key:'camera key down sound',keyUp:'camera key up sound'};
+Object.keys(SND).forEach(function(k){var s=spec(SND[k]);if(!s)return;var old=sfx[k];
+  if(s.off){sfx[k]=function(){};return}
+  var a=clip(s.file,function(){sfx[k]=old});
+  sfx[k]=function(){if(!sound)return;var c=a.cloneNode();c.volume=s.vol;var p=c.play();if(p&&p.catch)p.catch(function(){})}});
+(function(){var s=spec('boot sound');if(!s)return;if(s.off){bootOff=true;return}bootClip=clip(s.file,function(){bootClip=null});bootClip.volume=s.vol})();
+
+/* ===== BUTTON PICTURES AND ANIMATIONS — read from content/buttons.js. Empty lines keep the current button look. ===== */
+var BT=fields(text('BUTTON_TEXT','content/buttons.js'));
+function bt(k){for(var i=0;i<BT.length;i++)if(BT[i][0]===k)return BT[i][1];return''}
+function bget(pre,suf){for(var i=0;i<pre.length;i++){var v=bt(pre[i]+' '+suf);if(v)return v}return''}   /* the button's own line first, then the general line */
+/* stateful = a button that stays on or off (menu, camera, audio); otherwise "on" means being pressed down */
+function skin(b,pre,stateful){
+  var w=bget(pre,'words').toLowerCase(),sz=bget(pre,'size'),n=0,timer=0,isOn=false;
+  if(/^(hide|no|off|none)$/.test(w))b.classList.add('nowords');
+  if(sz){var m=sz.match(/(\d+(?:\.\d+)?)\D+(\d+(?:\.\d+)?)/);
+    if(m){b.style.width=b.style.minWidth=m[1]+'px';b.style.height=b.style.minHeight=m[2]+'px'}
+    else note('⚠ The size "'+sz+'" in content/buttons.js should look like  120 x 48  (width x height in pixels).')}
+  function one(folder,key){                                   /* reads one line: "file" or "file | seconds" */
+    var v=bget(pre,key);if(!v)return null;var p=v.split('|'),f=p[0].trim(),sec=parseFloat(p[1]);if(!f)return null;
+    var o={url:'content/'+folder+'/'+encodeURI(f),ms:(sec>0?sec:1)*1000},t=new Image();
+    t.onerror=function(){o.bad=true;note('⚠ Could not find content/'+folder+'/'+f+' — check the file name matches the line in content/buttons.js.');rest()};t.src=o.url;return o}
+  var C={on:one('images','on'),off:one('images','off'),loop:one('animations','loop animation'),onOnce:one('animations','on animation'),offOnce:one('animations','off animation')};
+  if(!(C.on||C.off||C.loop||C.onOnce||C.offOnce))return;      /* nothing set: the button keeps its current look */
+  function ok(o){return o&&!o.bad?o:null}
+  function paint(u){if(u){b.classList.add('skinned');b.style.setProperty('--skin-now','url("'+u+'")')}else b.classList.remove('skinned')}
+  function rest(){var o=isOn?(ok(C.loop)||ok(C.on)):ok(C.off);paint(o&&o.url)}   /* the picture a button settles on */
+  function change(on){if(on===isOn)return;isOn=on;clearTimeout(timer);var o=ok(on?C.onOnce:C.offOnce);
+    if(o){paint(o.url+'?'+(++n));timer=setTimeout(rest,o.ms)}else rest()}   /* the ?number makes the animation start again from its first frame */
+  function read(){return b.getAttribute('aria-selected')==='true'||b.getAttribute('aria-pressed')==='true'}
+  if(stateful){setTimeout(function(){isOn=read();rest();new MutationObserver(function(){change(read())}).observe(b,{attributes:true,attributeFilter:['aria-selected','aria-pressed']})},0)}
+  else{rest();
+    b.addEventListener('pointerdown',function(){change(true)});
+    ['pointerup','pointercancel','pointerleave'].forEach(function(ev){b.addEventListener(ev,function(){change(false)})});
+    b.addEventListener('keydown',function(e){if(e.key==='Enter'||e.key===' ')change(true)});
+    b.addEventListener('keyup',function(){change(false)})}}
+
+function btn(e,after){var a=el('a','key go');setKey(a,e.button,e.icon||ic('link button icon'));skin(a,['link button'],false);a.href=e.link;if(/^https?:/i.test(e.link)){a.target='_blank';a.rel='noopener'}a.addEventListener('click',function(){sfx.tx();if(after)after()});return a}
 
 /* ===== HOW EACH BUILT-IN PAGE IS DRAWN ===== */
 var RENDER={
@@ -63,13 +116,15 @@ var RENDER={
 function build(){
   document.querySelectorAll('[data-text]').forEach(function(x){x.textContent=get(x.dataset.text)});
   document.title=get('browser tab title');
+  [['bootSound','start-up sound button icon','start-up sound button'],['bootSilent','start-up silent button icon','start-up silent button'],['skip','skip button icon','skip button']].forEach(function(p){var b=document.getElementById(p[0]);setKey(b,b.textContent,ic(p[1]));skin(b,[p[2]],false)});
+  [].forEach.call(document.querySelectorAll('[data-cam]'),function(b){var i=ic('camera '+b.dataset.cam+' icon');if(i)setKey(b,b.textContent,i);skin(b,['cam '+b.dataset.cam+' button'],true)});
   var logo=get('hero image'),h1=document.querySelector('.hero h1');                /* a logo picture replaces the headline words */
   if(logo)logoFx(h1,'content/images/'+logo,get('hero image description'),get('hero headline'));
   var nav=document.getElementById('nav'),screens=document.getElementById('screens'),n=0;
   text('NAV_TEXT','content/navigation.js').split('\n').forEach(function(l){
     l=l.trim();if(!l||l[0]==='#'||l.indexOf('|')<0)return;
     var a=l.split('|'),label=a[0].trim(),page=a[1].trim().toLowerCase();n++;
-    var b=el('button','key',label),p=el('div');b.setAttribute('role','tab');b.id='t'+n;b.setAttribute('aria-controls','p'+n);b.setAttribute('aria-selected',n===1);
+    var b=el('button','key'),p=el('div');setKey(b,label,ic('menu button icon for '+page)||ic('menu button icon'));b.setAttribute('role','tab');b.id='t'+n;b.setAttribute('aria-controls','p'+n);b.setAttribute('aria-selected',n===1);skin(b,['menu button for '+page,'menu button'],true);
     p.setAttribute('role','tabpanel');p.id='p'+n;p.setAttribute('aria-labelledby',b.id);p.hidden=n>1;p.appendChild(el('h2','',label));
     if(RENDER.hasOwnProperty(page))RENDER[page](p);else loadPage(page,p);
     nav.appendChild(b);screens.appendChild(p)})}
@@ -90,7 +145,9 @@ var LINES=all('boot line');
 var boot=document.getElementById('boot'),timers=[],hum=null,done=false;
 function T(fn,ms){timers.push(setTimeout(fn,ms))}
 function audioBoot(total){
-  if(!sound||!ctx)return;var t=ctx.currentTime;
+  if(!sound||bootOff)return;
+  if(bootClip){try{bootClip.currentTime=0}catch(e){}var pp=bootClip.play();if(pp&&pp.catch)pp.catch(function(){});return}   /* your own start-up sound replaces the built-in one */
+  if(!ctx)return;var t=ctx.currentTime;
   tone(70,.6,'sine',.28,26);noise(.08,1500,200,.35,0,2);
   var f=ctx.createBiquadFilter(),g=ctx.createGain(),os=[ctx.createOscillator(),ctx.createOscillator()];
   os[0].type='sawtooth';os[1].type='square';
@@ -102,6 +159,7 @@ function audioBoot(total){
   [110,165,220,330].forEach(function(n,i){tone(n,1.5,'triangle',.07,n*1.01,total-.4+i*.05)})}
 function finish(){
   if(done)return;done=true;timers.forEach(clearTimeout);
+  if(bootClip&&!bootClip.paused){var bc=bootClip,v0=bc.volume,n2=0,fd=setInterval(function(){n2++;bc.volume=Math.max(0,v0*(1-n2/14));if(n2>=14){clearInterval(fd);bc.pause();bc.volume=v0}},100)}   /* fade your start-up sound out as the doors open */
   if(hum&&ctx){var n=ctx.currentTime;hum.g.gain.cancelScheduledValues(n);hum.g.gain.setValueAtTime(Math.max(hum.g.gain.value,.0002),n);hum.g.gain.exponentialRampToValueAtTime(.0001,n+1.4);hum.os.forEach(function(o){o.stop(n+1.5)})}
   sfx.whoosh();boot.classList.add('open');
   setTimeout(function(){boot.hidden=true;document.body.style.overflow='';document.querySelector('[role=tab]').focus()},1200)}
@@ -121,8 +179,8 @@ document.getElementById('bootSound').focus();
 /* ===================================================================
    AUDIO BUTTON, CLOCK, TAB SWITCHING
    =================================================================== */
-var mute=document.getElementById('mute');
-function setMute(){mute.setAttribute('aria-pressed',sound);mute.textContent=sound?get('audio on label'):get('audio off label')}
+var mute=document.getElementById('mute');skin(mute,['audio button'],true);
+function setMute(){mute.setAttribute('aria-pressed',sound);setKey(mute,sound?get('audio on label'):get('audio off label'),sound?ic('audio on icon'):ic('audio off icon'))}
 mute.onclick=function(){if(!sound){sound=true;wake();setMute();sfx.on()}else{sfx.off();sound=false;setMute()}};
 setMute();
 var clock=document.getElementById('clock');function tick(){clock.textContent=new Date().toISOString().slice(11,19)}tick();setInterval(tick,1000);

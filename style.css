@@ -199,3 +199,11 @@ body::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;op
 
 /* ===== MENU BUTTONS: all the same width, with the dots and words lined up down the left-hand side ===== */
 .navkey{width:min(100%,28rem);justify-content:flex-start}
+
+/* ===== TOP BAR: clock digits sit right up against UTC / the timezone name ===== */
+#clock,#clockLocal{text-align:right}
+
+/* ===== TOP BAR: the systems-nominal light and text sit at the far left, the clocks and audio button at the right ===== */
+.brand:empty{display:none}
+.leds{flex:1 1 auto}
+.leds>span:first-child{margin-right:auto}

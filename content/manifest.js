@@ -17,7 +17,7 @@ Title: The Bujinkan
 Text: A short documentary about the Japanese martial art "The Bujinkan", known colloquially in the west as Ninjutsu, and it's place in Ireland.
 Status: Short documentary, released
 Image: Alan_1.jpg
-Link: https://example.com
+Link: https://youtu.be/8rD96MB6teU?si=3nSBy6O86GmxMWSi
 
 Title: Tidal Lock
 Text: Two engineers, one failing habitat and a message from home that arrives too late.

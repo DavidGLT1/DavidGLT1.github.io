@@ -111,7 +111,9 @@ function btn(e,after){var a=el('a','key go');setKey(a,e.button,e.icon||ic('link 
 
 /* ===== HOW EACH BUILT-IN PAGE IS DRAWN ===== */
 var RENDER={
-  'manifest':function(p){var g=el('div','mods');list('MANIFEST_TEXT','content/manifest.js').forEach(function(e){var a=el('article','mod');img(a,e);a.appendChild(el('h3','',e.title));if(e.text)a.appendChild(el('p','',e.text));if(e.status)a.appendChild(el('small','',e.status));g.appendChild(a)});p.appendChild(g)},
+  'manifest':function(p){var g=el('div','mods');list('MANIFEST_TEXT','content/manifest.js').forEach(function(e){var a=el('article','mod');img(a,e);var h=el('h3'),t=e.text?el('p'):null;
+      function wrap(box,words){if(!e.link){box.textContent=words;return}var l=el('a','mlink',words);l.href=e.link;if(/^https?:/i.test(e.link)){l.target='_blank';l.rel='noopener'}l.addEventListener('click',sfx.tx);box.appendChild(l)}   /* a Link: line turns the title and text into a link */
+      wrap(h,e.title||'');a.appendChild(h);if(t){wrap(t,e.text);a.appendChild(t)}if(e.status)a.appendChild(el('small','',e.status));g.appendChild(a)});p.appendChild(g)},
   'captains-log':function(p){var g=el('div','log');list('LOG_TEXT','content/captains-log.js').forEach(function(e){var a=el('article');a.appendChild(el('h3','',e.title));a.appendChild(el('p','',e.text));g.appendChild(a)});p.appendChild(g)},
   'comms':function(p){var i=el('p','',get('comms intro'));i.style.maxWidth='38rem';p.appendChild(i);
     var ro=el('p','readout',get('comms idle message')),row=el('div','btns');ro.setAttribute('aria-live','polite');

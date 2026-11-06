@@ -47,7 +47,7 @@ function get(k){for(var i=0;i<F.length;i++)if(F[i][0]===k)return F[i][1];return'
 function all(k){return F.filter(function(f){return f[0]===k}).map(function(f){return f[1]})}
 function list(n,f){return blocks(text(n,f))}
 function el(tag,cls,txt){var e=document.createElement(tag);if(cls)e.className=cls;if(txt)e.textContent=txt;return e}
-function img(a,e){if(e.image){var m=el('img');m.src='content/images/'+e.image;m.alt=e.title||e.heading||'';a.appendChild(m)}}
+function img(a,e){if(e.image){var m=el('img');m.alt=e.title||e.heading||'';m.loading='lazy';m.decoding='async';m.onerror=function(){m.remove();note('⚠ Could not find content/images/'+e.image+' — check the file name matches the Image: line.')};m.src='content/images/'+encodeURI(e.image);a.appendChild(m)}}
 /* ===== BUTTON ICONS — read from content/icons.js ===== */
 var CT=fields(text('CONTROLS_TEXT','content/spaceship-controls.js'));
 function ct(k){for(var i=0;i<CT.length;i++)if(CT[i][0]===k)return CT[i][1];return''}
@@ -55,7 +55,7 @@ var IC=fields(text('ICON_TEXT','content/icons.js')),seen={};
 function ic(k){for(var i=0;i<IC.length;i++)if(IC[i][0]===k)return IC[i][1];return''}
 function note(msg){if(seen[msg])return;seen[msg]=1;document.body.insertBefore(el('div','warn',msg),document.body.firstChild)}
 function iconEl(spec){var e=el('span','ico');e.setAttribute('aria-hidden','true');
-  if(/\.(png|jpe?g|gif|svg|webp)$/i.test(spec)){var m=el('img');m.alt='';m.onerror=function(){m.remove();note('⚠ Could not find content/images/'+spec+' — check the file name matches the line in content/icons.js.')};m.src='content/images/'+spec;e.appendChild(m)}
+  if(/\.(png|apng|jpe?g|jfif|gif|svg|webp|avif|bmp|ico)$/i.test(spec)){var m=el('img');m.alt='';m.onerror=function(){m.remove();note('⚠ Could not find content/images/'+spec+' — check the file name matches the line in content/icons.js.')};m.src='content/images/'+spec;e.appendChild(m)}
   else e.textContent=spec;return e}
 /* puts an icon (emoji, symbol or picture) in front of a button's words; an empty icon keeps the default glowing dot; "none" removes it */
 function setKey(b,label,spec){b.textContent='';b.classList.toggle('hasicon',!!spec);if(spec&&!/^(none|off)$/i.test(spec))b.appendChild(iconEl(spec));b.appendChild(document.createTextNode(label||''))}

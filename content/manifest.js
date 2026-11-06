@@ -12,10 +12,10 @@ var MANIFEST_TEXT = String.raw`
 # Status: Short note under it, e.g. Feature, released   (optional)
 # Image: poster.jpg   (optional — a picture file you put in the content/images folder; png, jpg, gif, webp, svg, avif and bmp all work. blank-image.png is a placeholder)
 
-Title: Far Side Radio
-Text: A feature documentary about the engineers who listen to the quietest place we know.
-Status: Feature documentary, released
-Image: blank-image.png
+Title: The Bujinkan
+Text: A short documentary about the Japanese martial art "The Bujinkan", known colloquially in the west as Ninjutsu, and it's place in Ireland.
+Status: Short documentary, released
+Image: Alan_1.jpg
 
 Title: Tidal Lock
 Text: Two engineers, one failing habitat and a message from home that arrives too late.

@@ -179,7 +179,7 @@ function finish(){
 function engage(snd){
   sound=snd;if(snd)wake();if(!ctx)sound=false;setMute();
   document.getElementById('start').hidden=true;var term=document.getElementById('term');term.hidden=false;term.classList.add('on');
-  var out=document.getElementById('lines'),prog=document.getElementById('prog'),SPEED=1.4,HOLD=2000,t0=1000/SPEED,st=300/SPEED,total=(t0+LINES.length*st)/1000;   /* SPEED: 1.4 = 40% faster. HOLD: extra milliseconds the last line stays on screen. */
+  var out=document.getElementById('lines'),prog=document.getElementById('prog'),SPEED=1.3,HOLD=1500,t0=1000/SPEED,st=300/SPEED,total=(t0+LINES.length*st)/1000;   /* SPEED: 1.4 = 40% faster. HOLD: extra milliseconds the last line stays on screen. */
   out.textContent=LINES.join('\n');out.style.minHeight=out.offsetHeight+'px';out.textContent='';   /* reserve room for every line up front so the window never grows as the last lines appear */
   audioBoot(total);
   LINES.forEach(function(l,i){T(function(){out.textContent+=l+'\n';prog.style.width=((i+1)/LINES.length*100)+'%';sfx.chat();if(i%4===2)sfx.relay()},t0+i*st)});

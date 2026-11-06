@@ -207,3 +207,8 @@ body::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;op
 .brand:empty{display:none}
 .leds{flex:1 1 auto}
 .leds>span:first-child{margin-right:auto}
+
+/* ===== TOP BAR CLOCKS: every digit in a fixed-width cell, left-aligned, with UTC / the timezone name right beside them ===== */
+#clock,#clockLocal{display:inline-block;min-width:0;width:auto;text-align:left;white-space:nowrap}
+#clock .d,#clockLocal .d{display:inline-block;width:.64em;text-align:center}
+#clock .c,#clockLocal .c{display:inline-block;width:.32em;text-align:center}

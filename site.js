@@ -179,7 +179,7 @@ function finish(){
 function engage(snd){
   sound=snd;if(snd)wake();if(!ctx)sound=false;setMute();
   document.getElementById('start').hidden=true;var term=document.getElementById('term');term.hidden=false;term.classList.add('on');
-  var out=document.getElementById('lines'),prog=document.getElementById('prog'),SPEED=1.3,HOLD=1500,t0=1000/SPEED,st=300/SPEED,total=(t0+LINES.length*st)/1000;   /* SPEED: 1.4 = 40% faster. HOLD: extra milliseconds the last line stays on screen. */
+  var out=document.getElementById('lines'),prog=document.getElementById('prog'),SPEED=1.4,HOLD=2000,t0=1000/SPEED,st=300/SPEED,total=(t0+LINES.length*st)/1000;   /* SPEED: 1.4 = 40% faster. HOLD: extra milliseconds the last line stays on screen. */
   out.textContent=LINES.join('\n');out.style.minHeight=out.offsetHeight+'px';out.textContent='';   /* reserve room for every line up front so the window never grows as the last lines appear */
   audioBoot(total);
   LINES.forEach(function(l,i){T(function(){out.textContent+=l+'\n';prog.style.width=((i+1)/LINES.length*100)+'%';sfx.chat();if(i%4===2)sfx.relay()},t0+i*st)});
@@ -199,8 +199,10 @@ mute.onclick=function(){if(!sound){sound=true;wake();setMute();sfx.on()}else{sfx
 setMute();
 var clock=document.getElementById('clock'),lclock=document.getElementById('clockLocal'),tzl=document.getElementById('tzLabel');
 function two(v){return(v<10?'0':'')+v}
-function tick(){var d=new Date();clock.textContent=d.toISOString().slice(11,19);
-  lclock.textContent=two(d.getHours())+':'+two(d.getMinutes())+':'+two(d.getSeconds());          /* the viewer's own local time */
+/* every digit sits in its own fixed-width cell, so the clocks never change width as the numbers tick */
+function cells(e,t){var i;if(e.children.length!==t.length){e.textContent='';for(i=0;i<t.length;i++)e.appendChild(el('span',t.charAt(i)===':'?'c':'d'))}for(i=0;i<t.length;i++)if(e.children[i].textContent!==t.charAt(i))e.children[i].textContent=t.charAt(i)}
+function tick(){var d=new Date();cells(clock,d.toISOString().slice(11,19));
+  cells(lclock,two(d.getHours())+':'+two(d.getMinutes())+':'+two(d.getSeconds()));          /* the viewer's own local time */
   try{var p=new Intl.DateTimeFormat(undefined,{timeZoneName:'short'}).formatToParts(d);for(var i=0;i<p.length;i++)if(p[i].type==='timeZoneName'){tzl.textContent=p[i].value;break}}catch(e){}}   /* e.g. GMT, PST, CEST */
 tick();setInterval(tick,1000);
 var heads=[].slice.call(document.querySelectorAll('#nav .navkey'));

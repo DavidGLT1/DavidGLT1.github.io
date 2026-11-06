@@ -192,3 +192,10 @@ body::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;op
 @media(min-width:760px){.ctrlpad{grid-template-columns:auto minmax(0,27.3rem);justify-content:center;column-gap:clamp(1.5rem,17vw,13.1rem)}.ctrlpad .scope{width:100%}}
 /* ===== TOP BAR CLOCKS ===== */
 #clock,#clockLocal{font-variant-numeric:tabular-nums;color:var(--ink)}
+
+/* ===== TOP BAR CLOCKS: fixed room so the ticking digits never move anything ===== */
+#clock,#clockLocal{display:inline-block;min-width:9ch;text-align:left;font-variant-numeric:tabular-nums;font-feature-settings:"tnum"}
+#tzLabel{display:inline-block;min-width:5ch}
+
+/* ===== MENU BUTTONS: all the same width, with the dots and words lined up down the left-hand side ===== */
+.navkey{width:min(100%,28rem);justify-content:flex-start}

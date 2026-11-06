@@ -160,15 +160,15 @@ function T(fn,ms){timers.push(setTimeout(fn,ms))}
 function audioBoot(total){
   if(!sound||bootOff)return;
   if(bootClip){try{bootClip.currentTime=0}catch(e){}var pp=bootClip.play();if(pp&&pp.catch)pp.catch(function(){});return}   /* your own start-up sound replaces the built-in one */
-  if(!ctx)return;var t=ctx.currentTime;
+  if(!ctx)return;var t=ctx.currentTime,sp=total/4.6;   /* the built-in hum and whine were written for a 4.6 s boot; stretch them to fit the current length */
   tone(70,.6,'sine',.28,26);noise(.08,1500,200,.35,0,2);
   var f=ctx.createBiquadFilter(),g=ctx.createGain(),os=[ctx.createOscillator(),ctx.createOscillator()];
   os[0].type='sawtooth';os[1].type='square';
-  os.forEach(function(o,i){var m=i?2.01:1;o.frequency.setValueAtTime(38*m,t);o.frequency.linearRampToValueAtTime(62*m,t+4.6);o.connect(f);o.start(t)});
-  f.type='lowpass';f.frequency.setValueAtTime(120,t);f.frequency.exponentialRampToValueAtTime(1100,t+4.6);
-  g.gain.setValueAtTime(.0001,t);g.gain.exponentialRampToValueAtTime(.085,t+3.5);f.connect(g);g.connect(ctx.destination);hum={g:g,os:os};
-  var w=ctx.createOscillator(),wg=ctx.createGain();w.type='sine';w.frequency.setValueAtTime(90,t+.8);w.frequency.exponentialRampToValueAtTime(1400,t+3.4);
-  wg.gain.setValueAtTime(.0001,t+.8);wg.gain.exponentialRampToValueAtTime(.045,t+2.8);wg.gain.exponentialRampToValueAtTime(.0001,t+3.5);w.connect(wg);wg.connect(ctx.destination);w.start(t+.8);w.stop(t+3.6);
+  os.forEach(function(o,i){var m=i?2.01:1;o.frequency.setValueAtTime(38*m,t);o.frequency.linearRampToValueAtTime(62*m,t+4.6*sp);o.connect(f);o.start(t)});
+  f.type='lowpass';f.frequency.setValueAtTime(120,t);f.frequency.exponentialRampToValueAtTime(1100,t+4.6*sp);
+  g.gain.setValueAtTime(.0001,t);g.gain.exponentialRampToValueAtTime(.085,t+3.5*sp);f.connect(g);g.connect(ctx.destination);hum={g:g,os:os};
+  var w=ctx.createOscillator(),wg=ctx.createGain();w.type='sine';w.frequency.setValueAtTime(90,t+.8*sp);w.frequency.exponentialRampToValueAtTime(1400,t+3.4*sp);
+  wg.gain.setValueAtTime(.0001,t+.8*sp);wg.gain.exponentialRampToValueAtTime(.045,t+2.8*sp);wg.gain.exponentialRampToValueAtTime(.0001,t+3.5*sp);w.connect(wg);wg.connect(ctx.destination);w.start(t+.8*sp);w.stop(t+3.6*sp);
   [110,165,220,330].forEach(function(n,i){tone(n,1.5,'triangle',.07,n*1.01,total-.4+i*.05)})}
 function finish(){
   if(done)return;done=true;timers.forEach(clearTimeout);
@@ -179,10 +179,10 @@ function finish(){
 function engage(snd){
   sound=snd;if(snd)wake();if(!ctx)sound=false;setMute();
   document.getElementById('start').hidden=true;var term=document.getElementById('term');term.hidden=false;term.classList.add('on');
-  var out=document.getElementById('lines'),prog=document.getElementById('prog'),t0=1000,st=300,total=(t0+LINES.length*st)/1000;
+  var out=document.getElementById('lines'),prog=document.getElementById('prog'),SPEED=1.4,HOLD=2000,t0=1000/SPEED,st=300/SPEED,total=(t0+LINES.length*st)/1000;   /* SPEED: 1.4 = 40% faster. HOLD: extra milliseconds the last line stays on screen. */
   audioBoot(total);
   LINES.forEach(function(l,i){T(function(){out.textContent+=l+'\n';prog.style.width=((i+1)/LINES.length*100)+'%';sfx.chat();if(i%4===2)sfx.relay()},t0+i*st)});
-  T(finish,t0+LINES.length*st+900)}
+  T(finish,t0+LINES.length*st+900/SPEED+HOLD)}
 document.body.style.overflow='hidden';
 document.getElementById('bootSound').onclick=function(){engage(true)};
 document.getElementById('bootSilent').onclick=function(){engage(false)};

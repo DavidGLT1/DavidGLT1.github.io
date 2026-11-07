@@ -25,17 +25,17 @@ Status: Short documentary, released
 Image: Ariji_XR_Doc.png
 Link: https://vimeo.com/1110290283?share=copy&fl=cl&fe=ci#t=0
 
-Title: 
-Text: 
-Status: 
-Image: blank-image.png
-Link: https://example.com
+Title: Advancing Smart Immersive Technologies for Humanitarian Preparedness and Emergency Response
+Text: A short documentary following the collaboration between an Irish tech start up and a humanitarian agency action against hunger. To develop state of the art training immersive software.
+Status: Short documentary, released
+Image: Paris_xr_ireland.png
+Link: https://vimeo.com/1114504821?share=copy#t=0
 
-Title: 
-Text: 
-Status: 
-Image: blank-image.png
-Link: https://example.com
+Title: Tales From the Tattoo Parlour
+Text: A short documentary about a world renowned tattoo parlour right in the heart of Athlone, Ireland. 
+Status: Short documentary, released
+Image: Tattoo_parlour.png
+Link: https://youtu.be/hrFsSIHboks?si=CZLnFnsIeF7zXOQ8
 
 # ===== 🚫 DO NOT EDIT BELOW THIS LINE =====
 `;

@@ -222,6 +222,9 @@ body::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;op
 .mod h3 a.mlink{color:var(--ink)}
 .mod a.mlink:hover,.mod a.mlink:focus-visible{color:var(--accent);border-bottom-color:var(--accent)}
 
-/* ===== CAPTAINS LOG: an optional portrait picture to the left of the text (set with an Image: line in content/captains-log.js) ===== */
-.log article.withimg{display:grid;grid-template-columns:minmax(5.5rem,10rem) minmax(0,1fr);gap:1rem 1.2rem;align-items:start}
-.log article.withimg img{width:100%;height:auto;max-height:none;aspect-ratio:3/4;object-fit:contain;margin:0;background:var(--panel);border:1px solid var(--line)}
+/* ===== CAPTAINS LOG: full-width boxes, with an optional portrait picture to the right of the text (set with an Image: line in content/captains-log.js) ===== */
+.log{max-width:none;width:100%}
+.log article{border:1px solid var(--line);border-left:4px solid var(--accent);background:var(--bg);padding:1rem 1.2rem}
+.log article.withimg{display:grid;grid-template-columns:minmax(0,1fr) clamp(6.5rem,26%,16rem);gap:1rem 1.4rem;align-items:start}
+.log article.withimg>div{grid-column:1;grid-row:1}
+.log article.withimg img{grid-column:2;grid-row:1;width:100%;height:auto;max-height:none;aspect-ratio:3/4;object-fit:contain;margin:0;background:var(--panel);border:1px solid var(--line)}

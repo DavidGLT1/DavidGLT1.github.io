@@ -61,7 +61,7 @@ Cam button 3: CAM 3
 Monitor plate: LHP-2 // SURFACE OPTICS
 
 # Intro paragraph on the COMMS page (the buttons come from content/comms.js)
-Comms intro: Commissions, collaborations, crew enquiries and pitches are all welcome. Send a message and we’ll reply within two working days.
+Comms intro: For any queries, please reach out by clicking the button below.
 
 # Message under the COMMS buttons before anyone clicks
 Comms idle message: Channel idle.

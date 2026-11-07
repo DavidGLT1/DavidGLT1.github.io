@@ -12,7 +12,7 @@ var COMMS_TEXT = String.raw`
 # Link: mailto:you@example.com   (an email: start with mailto: — a phone: tel:+441234567890 — a website: start with https://)
 
 Button: Transmit message
-Link: mailto:hello@lunarhorizon.example
+Link: mailto:lunarhorizonproductions@gmail.com
 
 # ===== 🚫 DO NOT EDIT BELOW THIS LINE =====
 `;

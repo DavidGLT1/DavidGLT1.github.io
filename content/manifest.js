@@ -26,7 +26,7 @@ Image: Ariji_XR_Doc.png
 Link: https://vimeo.com/1110290283?share=copy&fl=cl&fe=ci#t=0
 
 Title: Advancing Smart Immersive Technologies for Humanitarian Preparedness and Emergency Response
-Text: A short documentary following the collaboration between an Irish tech start up and a humanitarian agency action against hunger. To develop state of the art training immersive software.
+Text: A short documentary following the collaboration between an Irish tech start up and a humanitarian agency "Action Against Hunger". To develop state of the art immersive training software.
 Status: Short documentary, released
 Image: Paris_xr_ireland.png
 Link: https://vimeo.com/1114504821?share=copy#t=0
